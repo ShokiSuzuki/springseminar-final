@@ -15,7 +15,7 @@ transform = transforms.Compose([
     transforms.RandomHorizontalFlip(),
     transforms.RandomCrop(32),
     transforms.ToTensor(),                                   # データをテンソル型に変換
-    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+    transforms.Normalize((0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762))
     ])  # データの正規化（1つ目のタプル：各チャネルの平均， 2つ目のタプル：各チャネルの標準偏差)
 
 # 訓練データの読み込み
@@ -170,14 +170,14 @@ def ResNet152():
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print(device)
-net = ResNet18().to(device)
+net = ResNet34().to(device)
 print(net)
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 
-for epoch in range(20):  # エポック数
+for epoch in range(10):  # エポック数
 
     running_loss = 0.0
     for i, data in enumerate(trainloader, 0):
@@ -197,7 +197,7 @@ for epoch in range(20):  # エポック数
 
         # lossの出力
         running_loss += loss.item()
-        if i % 2000 == 1999:    # 2000iterationごとに出力
+        if i % 2000 == 999:    # 1000iterationごとに出力
             print('[%d, %5d] loss: %.3f' %
                   (epoch + 1, i + 1, running_loss / 2000))
             running_loss = 0.0
@@ -221,3 +221,28 @@ with torch.no_grad():
 
 print('Accuracy of the network on the 10000 test images: %d %%' % (
     100 * correct / total))
+
+
+# create csv
+import csv
+
+with open('test_result_cifar.csv', 'a') as f:
+    writer = csv.writer(f)
+    writer.writerow(["image_id", "prediction"])
+
+image_id = 0
+
+with torch.no_grad():
+    for data in testloader:
+        # images, labels = data
+        images, labels = data[0].to(device), data[1].to(device)
+        outputs = net(images)
+        _, predicted = torch.max(outputs, 1)
+
+        with open('test_result_cifar.csv', 'a') as f:
+            writer = csv.writer(f)
+            
+            for i in range(4):    # Dataloaderで設定したバッチサイズ
+                writer.writerow([image_id, predicted[i].item()])
+                image_id += 1
+

@@ -1,5 +1,5 @@
-FROM pytorch/pytorch:latest
+FROM pytorch/pytorch:1.8.0-cuda11.1-cudnn8-devel
 
 WORKDIR /work
 
-RUN pip install -y matplotlib     
+RUN pip install matplotlib     
