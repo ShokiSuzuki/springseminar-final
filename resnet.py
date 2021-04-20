@@ -9,7 +9,14 @@ import torch.optim as optim
 import torch.nn.functional as F
 
 
-"""## ネットワークの定義"""
+"""## ネットワークの定義
+元のネットワーク：
+https://github.com/kuangliu/pytorch-cifar/blob/master/models/resnet.py
+
+
+
+"""
+
 
 
 class BasicBlock(nn.Module):
@@ -17,14 +24,15 @@ class BasicBlock(nn.Module):
 
     def __init__(self, in_planes, planes, stride=1):
         super(BasicBlock, self).__init__()
+        num_group = 4
         self.conv1 = nn.Conv2d(
             in_planes, planes, kernel_size=3, stride=stride, padding=1, bias=False)
         #self.bn1 = nn.BatchNorm2d(planes)
-        self.ln1 = nn.LayerNorm(planes)
+        self.gn1 = nn.GroupNorm(num_group, planes)
         self.conv2 = nn.Conv2d(planes, planes, kernel_size=3,
                                stride=1, padding=1, bias=False)
         #self.bn2 = nn.BatchNorm2d(planes)
-        self.ln2 = nn.LayerNorm(planes)
+        self.gn2 = nn.GroupNorm(num_group, planes)
 
         self.shortcut = nn.Sequential()
         if stride != 1 or in_planes != self.expansion*planes:
@@ -32,14 +40,14 @@ class BasicBlock(nn.Module):
                 nn.Conv2d(in_planes, self.expansion*planes,
                           kernel_size=1, stride=stride, bias=False),
                 #nn.BatchNorm2d(self.expansion*planes)
-                nn.LayerNorm(self.expansion * planes)
+                nn.GroupNorm(num_group, planes)
             )
 
     def forward(self, x):
         #out = F.relu(self.bn1(self.conv1(x)))
-        out = F.relu(self.ln1(self.conv1(x)))
+        out = F.relu(self.gn1(self.conv1(x)))
         # out = self.bn2(self.conv2(out))
-        out = self.ln2(self.conv2(out))
+        out = self.gn2(self.conv2(out))
         out += self.shortcut(x)
         out = F.relu(out)
         return out
@@ -77,13 +85,15 @@ class Bottleneck(nn.Module):
 
 
 class ResNet(nn.Module):
-    def __init__(self, block, num_blocks, num_classes=10, channels=3):
+    def __init__(self, block, num_blocks, num_classes=10, channels = 3):
         super(ResNet, self).__init__()
         self.in_planes = 64
+        num_group = 4
 
         self.conv1 = nn.Conv2d(channels, 64, kernel_size=3,
                                stride=1, padding=1, bias=False)
-        self.bn1 = nn.BatchNorm2d(64)
+        # self.bn1 = nn.BatchNorm2d(64)
+        self.gn1 = nn.GroupNorm(num_group, 64)
         self.layer1 = self._make_layer(block, 64, num_blocks[0], stride=1)
         self.layer2 = self._make_layer(block, 128, num_blocks[1], stride=2)
         self.layer3 = self._make_layer(block, 256, num_blocks[2], stride=2)
@@ -99,7 +109,7 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
-        out = F.relu(self.bn1(self.conv1(x)))
+        out = F.relu(self.gn1(self.conv1(x)))
         out = self.layer1(out)
         out = self.layer2(out)
         out = self.layer3(out)

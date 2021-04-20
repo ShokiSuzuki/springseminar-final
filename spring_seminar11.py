@@ -16,7 +16,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('dataset', help='define dataset', default='cifar100', type=str)
 parser.add_argument('--epoch', help='define number of epoch', default=10, type=int)
-parser.add_argument('--batch_size', help='define batch size', default=128, type=int)
+parser.add_argument('--batch_size', help='define batch size', default=4, type=int)
 args = parser.parse_args()
 
 num_epoch = args.epoch
@@ -102,7 +102,7 @@ else:
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print(device)
-net = resnet.ResNet34(num_class=num_class).to(device)
+net = resnet.ResNet34(num_class=num_class, channels=channels).to(device)
 print(net)
 
 criterion = nn.CrossEntropyLoss()
@@ -114,7 +114,7 @@ for epoch in range(num_epoch):  # エポック数
     running_loss = 0.0
     for i, data in enumerate(trainloader, 0):
         # 入力データの取得. 変数dataはリスト[inputs, labels]
-        #inputs, labels = data  # cpuの場合はこっちでも可
+        # inputs, labels = data  # cpuの場合はこっちでも可
 
         inputs, labels = data[0].to(device), data[1].to(device)
 
@@ -136,12 +136,12 @@ for epoch in range(num_epoch):  # エポック数
 
 
 # モデルの保存
-PATH = './model.pth'
+PATH = './{}.pth'.format(args.dataset)
 torch.save(net.state_dict(), PATH)
 
 print('Finished Training')
 
-# PATH = './emnist_test_net.pth'
+# PATH = './{}.pth'.format(args.dataset)
 # net.load_state_dict(torch.load(PATH))
 
 correct = 0
@@ -158,10 +158,6 @@ with torch.no_grad():
 print('Accuracy of the network on the 10000 test images: %d %%' % (
     100 * correct / total))
 
-
-
-PATH = './model.pth'
-net.load_state_dict(torch.load(PATH))
 
 class_correct = list(0. for i in range(num_class))
 class_total = list(0. for i in range(num_class))
