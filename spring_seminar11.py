@@ -15,15 +15,21 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('dataset', help='define dataset', default='cifar100', type=str)
-parser.add_argument('--epoch', help='define number of epoch', default=10, type=int)
-parser.add_argument('--batch_size', help='define batch size', default=4, type=int)
+#parser.add_argument('--epoch', help='define number of epoch', default=10, type=int)
+#parser.add_argument('--batch_size', help='define batch size', default=4, type=int)
 args = parser.parse_args()
 
-num_epoch = args.epoch
-batch_size = args.batch_size
+#num_epoch = args.epoch
+#batch_size = args.batch_size
 
 
 if args.dataset == 'cifar100':
+    num_epoch = 50
+    batch_size = 4
+    num_class = 100
+    channels = 3
+    
+
     # 前処理を行う関数を複数定義
     transform = transforms.Compose([
         transforms.RandomHorizontalFlip(),
@@ -66,10 +72,13 @@ if args.dataset == 'cifar100':
                "bicycle", "bus", "motorcycle", "pickup truck", "train",
                "lawn-mower", "rocket", "streetcar", "tank", "tractor")
 
-    num_class = 100
-    channels = 3
 
 else:
+    num_epoch = 50
+    batch_size = 4
+    num_class = 47
+    channels = 1
+
     # 前処理を行う関数を複数定義
     transform = transforms.Compose([
         #transforms.RandomHorizontalFlip(),
@@ -96,8 +105,6 @@ else:
                'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
                'a', 'b', 'd', 'e', 'f', 'g', 'h', 'n', 'q', 'r', 't',)
 
-    num_class = 47
-    channels = 1
 
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -107,7 +114,6 @@ print(net)
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
-
 
 for epoch in range(num_epoch):  # エポック数
 
@@ -141,8 +147,8 @@ torch.save(net.state_dict(), PATH)
 
 print('Finished Training')
 
-# PATH = './{}.pth'.format(args.dataset)
-# net.load_state_dict(torch.load(PATH))
+#PATH = './{}.pth'.format(args.dataset)
+#net.load_state_dict(torch.load(PATH))
 
 correct = 0
 total = 0
@@ -181,3 +187,26 @@ for i in range(num_class):
 
 
 
+# create csv
+import csv
+with open('test_result_{}.csv'.format(args.dataset), 'w') as f:
+    writer = csv.writer(f)
+    writer.writerow(["image_id", "prediction"])
+
+image_id = 0
+if args.dataset == 'emnist':
+    image_id += 10000
+
+with torch.no_grad():
+    for data in testloader:
+        # images, labels = data
+        images, labels = data[0].to(device), data[1].to(device)
+        outputs = net(images)
+        _, predicted = torch.max(outputs, 1)
+
+        with open('test_result_{}.csv'.format(args.dataset), 'a') as f:
+            writer = csv.writer(f)
+
+            for i in range(len(predicted)):   # Dataloaderで設定したバッチサイズ
+                writer.writerow([image_id, predicted[i].item()])
+                image_id += 1
