@@ -74,14 +74,15 @@ if args.dataset == 'cifar100':
 
 
 else:
-    num_epoch = 50
-    batch_size = 4
+    num_epoch = 5
+    batch_size = 64
     num_class = 47
     channels = 1
 
     # 前処理を行う関数を複数定義
     transform = transforms.Compose([
         #transforms.RandomHorizontalFlip(),
+        transforms.RandomRotation(15),
         transforms.RandomCrop(28),
         transforms.ToTensor(),                                   # データをテンソル型に変換
         transforms.Normalize(0.1736, 0.3317)
@@ -109,7 +110,7 @@ else:
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print(device)
-net = resnet.ResNet34(num_class=num_class, channels=channels).to(device)
+net = resnet.ResNet50(num_class=num_class, channels=channels).to(device)
 print(net)
 
 criterion = nn.CrossEntropyLoss()
