@@ -24,7 +24,7 @@ args = parser.parse_args()
 
 
 if args.dataset == 'cifar100':
-    num_epoch = 50
+    num_epoch = 20
     batch_size = 4
     num_class = 100
     channels = 3
@@ -35,7 +35,8 @@ if args.dataset == 'cifar100':
         transforms.RandomHorizontalFlip(),
         transforms.RandomCrop(32),
         transforms.ToTensor(),                                   # データをテンソル型に変換
-        transforms.Normalize((0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762))
+        transforms.Normalize((0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762)),
+        transforms.RandomErasing()
     ])  # データの正規化（1つ目のタプル：各チャネルの平均， 2つ目のタプル：各チャネルの標準偏差)
 
     # 訓練データの読み込み
@@ -82,7 +83,7 @@ else:
     # 前処理を行う関数を複数定義
     transform = transforms.Compose([
         #transforms.RandomHorizontalFlip(),
-        transforms.RandomRotation(15),
+        #transforms.RandomRotation(15),
         transforms.RandomCrop(28),
         transforms.ToTensor(),                                   # データをテンソル型に変換
         transforms.Normalize(0.1736, 0.3317)
@@ -112,6 +113,9 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print(device)
 net = resnet.ResNet50(num_class=num_class, channels=channels).to(device)
 print(net)
+
+#PATH = './{}.pth'.format(args.dataset)
+#net.load_state_dict(torch.load(PATH))
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
@@ -148,8 +152,6 @@ torch.save(net.state_dict(), PATH)
 
 print('Finished Training')
 
-#PATH = './{}.pth'.format(args.dataset)
-#net.load_state_dict(torch.load(PATH))
 
 correct = 0
 total = 0

@@ -11,31 +11,10 @@ import torch.nn.functional as F
 
 """## ネットワークの定義
 
-研究でVision Transformerについて調べているときに気になったことを検証する
-    Vision Transformerの理解が深まるし，コンペにも参加できる! (一石二鳥)
-
-気になったこと
-    Layer Normalizationはどれくらい効果があるの?そもそもLayer Normalizationとは?
-    MLPやMulti-Head Attentionの前に正規化を行っている意味は?
-
-
-
-元のネットワーク：
-https://github.com/kuangliu/pytorch-cifar/blob/master/models/resnet.py
-
-変更点(コメントを付けてるところ):
-    batch norm -> layer norm(group norm (num_groups= 1))
-        そもそもgroup normはResNetをつかって実験されてるものだった
-        https://arxiv.org/abs/1803.08494
-
-
-    normを畳み込みの前に持ってくる
-        x : conv -> norm
-        o : norm -> conv
-
 
 結果：
     group normは効果があった(emnistでパラメータを変えなくても5ptくらい向上)
+        batch sizeを小さくしても精度が落ちないので，メモリを削減できる．(なのにViTはメモリ消費量がやばい)
     normを畳み込みの前に持ってきたのは効果があったのかよくわからない．
 
 """
@@ -65,7 +44,8 @@ class BasicBlock(nn.Module):
             )
 
     def forward(self, x):
-        out = F.relu(self.conv1(self.gn1(x))) # here
+        #out = F.relu(self.conv1(self.gn1(x))) # here
+        out = self.conv1(F.relu(self.gn1(x))) # here
         out = self.conv2(self.gn2(out))       # here
         out += self.shortcut(x)
         out = F.relu(out)
@@ -96,11 +76,13 @@ class Bottleneck(nn.Module):
             )
 
     def forward(self, x):
-        out = F.relu(self.conv1(self.gn1(x)))          # here
-        out = F.relu(self.conv2(self.gn2(out)))        # here
+        #out = F.relu(self.conv1(self.gn1(x)))          # here
+        out = self.conv1(F.gelu(self.gn1(x)))           # here
+        #out = F.relu(self.conv2(self.gn2(out)))        # here
+        out = self.conv2(F.gelu(self.gn2(out)))        # here
         out = self.conv3(self.gn3(out))                # here
+        out = F.gelu(out)
         out += self.shortcut(x)
-        out = F.relu(out)
         return out
 
 
@@ -128,7 +110,8 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
-        out = F.relu(self.conv1(self.gn1(x)))
+        #out = F.relu(self.conv1(self.gn1(x))) # here
+        out = self.conv1(F.gelu(self.gn1(x)))
         out = self.layer1(out)
         out = self.layer2(out)
         out = self.layer3(out)
