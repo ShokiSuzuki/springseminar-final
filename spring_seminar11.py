@@ -24,7 +24,7 @@ args = parser.parse_args()
 
 
 if args.dataset == 'cifar100':
-    num_epoch = 20
+    num_epoch = 30
     batch_size = 4
     num_class = 100
     channels = 3
@@ -75,8 +75,8 @@ if args.dataset == 'cifar100':
 
 
 else:
-    num_epoch = 5
-    batch_size = 64
+    num_epoch = 10
+    batch_size = 32
     num_class = 47
     channels = 1
 
@@ -86,7 +86,8 @@ else:
         #transforms.RandomRotation(15),
         transforms.RandomCrop(28),
         transforms.ToTensor(),                                   # データをテンソル型に変換
-        transforms.Normalize(0.1736, 0.3317)
+        transforms.Normalize(0.1736, 0.3317),
+        transforms.RandomErasing()
         ])  # データの正規化（1つ目のタプル：各チャネルの平均， 2つ目のタプル：各チャネルの標準偏差)
 
     # 訓練データの読み込み
