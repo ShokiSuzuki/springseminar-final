@@ -16,7 +16,7 @@ MLPやMulti-Head Attentionの前に正規化を行っている意味は?
 geluって効果あるの?
 
 
-### 変更点(resnet.pyでコメントを付けてるところ):
+### 変更点(resnet.pyでコメントを付けてるところ)
     batch norm -> layer norm(group norm (num_groups= 1))
         そもそもgroup normはResNetをつかって実験されてるものだった
         https://arxiv.org/abs/1803.08494
@@ -33,4 +33,5 @@ Layer Normalizationにしたことで5ptくらい上がった．また，バッ�
 normを先に持ってくる方法はあまり精度が変わらなかった．また，geluにしても精度は変わらない．
 
 ## 感想
-Vision Transformerに使われている基本的な手法はわかったけど，それを選んだ理由はよくわからない．コンペは楽しかった．
+ViTにLayer Normalizationが使われている理由は，膨大なデータセットを学習するときにバッチサイズを大きくするとメモリが大きくなるからだと思う(それでもViTはメモリ消費量がやばい)．
+normを先に持ってきたり，geluを使ったりしている理由はよくわからない．コンペは楽しかった．

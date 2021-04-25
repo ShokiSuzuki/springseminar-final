@@ -9,15 +9,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 
 
-"""## ネットワークの定義
-
-
-結果：
-    group normは効果があった(emnistでパラメータを変えなくても5ptくらい向上)
-        batch sizeを小さくしても精度が落ちないので，メモリを削減できる．(なのにViTはメモリ消費量がやばい)
-    normを畳み込みの前に持ってきたのは効果があったのかよくわからない．
-
-"""
+"""## ネットワークの定義"""
 
 
 
