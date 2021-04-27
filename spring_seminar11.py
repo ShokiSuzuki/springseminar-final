@@ -24,8 +24,8 @@ args = parser.parse_args()
 
 
 if args.dataset == 'cifar100':
-    num_epoch = 30
-    batch_size = 4
+    num_epoch = 100
+    batch_size = 32
     num_class = 100
     channels = 3
     
@@ -75,7 +75,7 @@ if args.dataset == 'cifar100':
 
 
 else:
-    num_epoch = 10
+    num_epoch = 5
     batch_size = 32
     num_class = 47
     channels = 1
@@ -112,14 +112,25 @@ else:
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print(device)
-net = resnet.ResNet50(num_class=num_class, channels=channels).to(device)
+net = resnet.ResNet34(num_class=num_class, channels=channels).to(device)
 print(net)
 
 #PATH = './{}.pth'.format(args.dataset)
 #net.load_state_dict(torch.load(PATH))
 
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+# 参考
+# https://discuss.pytorch.org/t/weights-in-weighted-loss-nn-crossentropyloss/69514
+cnt = [0] * num_class
+for i in trainset.targets:
+    cnt[i] += 1
+
+s = sum(cnt)
+weights = [1 / n for n in cnt]
+print(weights)
+weights = torch.FloatTensor(weights).to(device)
+
+criterion = nn.CrossEntropyLoss(weight=weights)
+optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.9)
 
 for epoch in range(num_epoch):  # エポック数
 
@@ -141,15 +152,15 @@ for epoch in range(num_epoch):  # エポック数
 
         # lossの出力
         running_loss += loss.item()
-        if i % 2000 == 1999:    #  2000iterationごとに出力
+        if i % 1000 == 999:    #  1000iterationごとに出力
             print('[%d, %5d] loss: %.3f' %
-                  (epoch + 1, i + 1, running_loss / 2000))
+                  (epoch + 1, i + 1, running_loss / 1000))
             running_loss = 0.0
 
 
 # モデルの保存
-PATH = './{}.pth'.format(args.dataset)
-torch.save(net.state_dict(), PATH)
+#PATH = './{}.pth'.format(args.dataset)
+#torch.save(net.state_dict(), PATH)
 
 print('Finished Training')
 

@@ -9,7 +9,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 
 
-"""## ネットワークの定義"""
+# ネットワークの定義
 
 
 
@@ -37,10 +37,10 @@ class BasicBlock(nn.Module):
 
     def forward(self, x):
         #out = F.relu(self.conv1(self.gn1(x))) # here
-        out = self.conv1(F.relu(self.gn1(x))) # here
-        out = self.conv2(self.gn2(out))       # here
+        out = self.conv1(F.gelu(self.gn1(x))) # here
+        out = self.conv2(F.gelu(self.gn2(out)))       # here
+        #out = F.relu(out)
         out += self.shortcut(x)
-        out = F.relu(out)
         return out
 
 
@@ -72,8 +72,8 @@ class Bottleneck(nn.Module):
         out = self.conv1(F.gelu(self.gn1(x)))           # here
         #out = F.relu(self.conv2(self.gn2(out)))        # here
         out = self.conv2(F.gelu(self.gn2(out)))        # here
-        out = self.conv3(self.gn3(out))                # here
-        out = F.gelu(out)
+        out = self.conv3(F.gelu(self.gn3(out)))          # here
+        #out = F.gelu(out)
         out += self.shortcut(x)
         return out
 
