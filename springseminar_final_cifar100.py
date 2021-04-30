@@ -10,7 +10,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 import resnet
-import WideResNet_tmp
+import WideResNet_for_cifar
 import argparse
 import csv
 from torch.optim import lr_scheduler
@@ -94,7 +94,7 @@ classes = ("beaver", "dolphin", "otter", "seal", "whale",
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print(device)
 
-net = WideResNet_tmp.WideResNet(depth=depth, num_classes=num_class, channels=channels, widen_factor=width, drop_rate=0.2).to(device)
+net = WideResNet_for_cifar.WideResNet(depth=depth, num_classes=num_class, channels=channels, widen_factor=width, drop_rate=0.2).to(device)
 print(net)
 
 
