@@ -33,16 +33,12 @@ num_epoch = 25
 batch_size = 256
 num_class = 100
 channels = 3
-img_size = 26
 
 # 前処理を行う関数を複数定義
 transform = transforms.Compose([
-    #transforms.RandomResizedCrop(128, scale=(1.0, 1.0), ratio=(1.0, 1.0)),
-    #transforms.Resize(100),
-    #transforms.RandomCrop(img_size),
-    #transforms.Resize(32),
-    transforms.RandomResizedCrop(32, scale=(0.7, 0.9)),
+    #transforms.Resize(40),
     #transforms.RandomCrop(32),
+    #transforms.RandomResizedCrop(32, scale=(0.7, 0.9)),
     transforms.RandomRotation(10),
     transforms.RandomHorizontalFlip(),
     transforms.ToTensor(),                                   # データをテンソル型に変換
@@ -51,7 +47,6 @@ transform = transforms.Compose([
 ])  # データの正規化（1つ目のタプル：各チャネルの平均， 2つ目のタプル：各チャネルの標準偏差)
 
 test_transform = transforms.Compose([
-    #transforms.Resize(img_size),
     transforms.ToTensor(),                                   # データをテンソル型に変換
     transforms.Normalize((0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762)),
 ])  # データの正規化（1つ目のタプル：各チャネルの平均， 2つ目のタプル：各チャネルの標準偏差)
@@ -94,7 +89,7 @@ classes = ("beaver", "dolphin", "otter", "seal", "whale",
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print(device)
 
-net = WideResNet_for_cifar.WideResNet(depth=depth, num_classes=num_class, channels=channels, widen_factor=width, drop_rate=0.2).to(device)
+net = WideResNet.WideResNet(depth=depth, num_classes=num_class, channels=channels, widen_factor=width, drop_rate=0.2).to(device)
 print(net)
 
 
