@@ -9,8 +9,19 @@ CIFAR100とEMNIST By Mergeの識別精度を競う．
 
 #### 変更した箇所等
 * 活性化関数をreluからgelu
-* 畳み込みなどの順番(conv, norm, act, conv, norm, add, act -> )
-
+* 畳み込みなどの順番(conv, norm, act, conv, norm, add, act -> norm, conv, act, norm, conv, add)
+* 学習率をスケジューリング
 
 
 ### CIFAR-100用
+ベース：Wide ResNet ([コピー元](https://github.com/murarin/pytorch_models/blob/master/WideResNet.py))
+
+#### 変更した箇所等
+* 活性化関数をreluからgelu
+* 学習率をスケジューリング
+
+
+## まとめ
+ネットワークの変更点はあまりないが、resnetについて調べていたら畳み込みなどの順番で精度が変わるらしいとのことだったので、取り入れてみた。
+学習率のスケジューリングは、学習を早く終わらせたいために適当に値を決めて取り入れてみたら、学習率を小さくして学習していた時と同等の精度を早く出せるようになった。ただ、Wide ResNetはエポック数が少ないからか、本来の精度が出なかった。
+
