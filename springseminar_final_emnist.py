@@ -79,14 +79,11 @@ else:
     net = resnet.ResNet152(num_class=num_class, channels=channels).to(device)
 print(net)
 
-#PATH = './emnist.pth'
-#net.load_state_dict(torch.load(PATH))
 
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 #scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[3, 7], gamma=0.1)
-
 
 best_score = 0.0
 
@@ -135,15 +132,17 @@ for epoch in range(num_epoch):  # エポック数
 
     if score > best_score:
         # モデルの保存
-        PATH = './emnist_best.pth'
+        PATH = './emnist.pth'
         torch.save(net.state_dict(), PATH)
         best_score = score
         
 
-
 print('Finished Training')
 
+PATH = './emnist.pth'
+net.load_state_dict(torch.load(PATH))
 
+# クラスごとの精度
 class_correct = list(0. for i in range(num_class))
 class_total = list(0. for i in range(num_class))
 with torch.no_grad():

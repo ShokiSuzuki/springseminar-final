@@ -155,7 +155,7 @@ PATH = './cifar100.pth'
 net.load_state_dict(torch.load(PATH))
 
 
-
+# クラスごとの精度
 class_correct = list(0. for i in range(num_class))
 class_total = list(0. for i in range(num_class))
 with torch.no_grad():

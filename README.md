@@ -16,6 +16,9 @@ CIFAR100とEMNIST By Mergeの識別精度を競う．
 #### 実行方法
     python springseminar_final_emnist.py
 
+#### 結果
+test accuracy : 91.0499 %
+
 
 ### CIFAR-100用
 ベース：Wide ResNet ([ソース](https://github.com/murarin/pytorch_models/blob/master/WideResNet.py))
@@ -27,6 +30,8 @@ CIFAR100とEMNIST By Mergeの識別精度を競う．
 #### 実行方法
     python springseminar_final_cifar100.py
 
+#### 結果
+test accuracy : 68.1700 %
 
 ## まとめ
 ネットワークの変更点はあまりないが、resnetについて調べていたら畳み込みなどの順番で精度が変わるとのことだったので、自分で実装してみた。
