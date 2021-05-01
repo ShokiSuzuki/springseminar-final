@@ -2,6 +2,7 @@
 
 CIFAR100とEMNIST By Mergeの識別精度を競う．
 
+
 ## ネットワークの定義
 
 ### EMNIST By Merge用
@@ -12,6 +13,9 @@ CIFAR100とEMNIST By Mergeの識別精度を競う．
 * 畳み込みなどの順番(conv, norm, act, conv, norm, add, act -> norm, conv, act, norm, conv, add)
 * 学習率をスケジューリング
 
+#### 実行方法
+    python springseminar_final_emnist.py
+
 
 ### CIFAR-100用
 ベース：Wide ResNet ([ソース](https://github.com/murarin/pytorch_models/blob/master/WideResNet.py))
@@ -19,6 +23,9 @@ CIFAR100とEMNIST By Mergeの識別精度を競う．
 #### 変更した箇所等
 * 活性化関数をreluからgelu
 * 学習率をスケジューリング
+
+#### 実行方法
+    python springseminar_final_cifar100.py
 
 
 ## まとめ
